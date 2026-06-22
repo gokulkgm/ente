@@ -4,6 +4,7 @@ import 'package:ente_auth/app/view/app.dart';
 import 'package:ente_auth/events/icons_changed_event.dart';
 import 'package:ente_auth/l10n/l10n.dart';
 import 'package:ente_auth/locale.dart';
+import 'package:ente_auth/services/launch_at_login_service.dart';
 import 'package:ente_auth/services/preference_service.dart';
 import 'package:ente_auth/theme/ente_theme.dart';
 import 'package:ente_auth/ui/components/captioned_text_widget.dart';
@@ -144,6 +145,32 @@ class _AdvancedSectionWidgetState extends State<AdvancedSectionWidget> {
                 await PreferenceService.instance.setShouldMinimizeOnCopy(
                   !PreferenceService.instance.shouldMinimizeOnCopy(),
                 );
+                setState(() {});
+              },
+            ),
+          ),
+          sectionOptionSpacing,
+        ],
+        if (Platform.isMacOS && LaunchAtLoginService.isSupported) ...[
+          MenuItemWidget(
+            captionedTextWidget: CaptionedTextWidget(
+              title: l10n.launchAtLogin,
+            ),
+            trailingWidget: ToggleSwitchWidget(
+              value: () =>
+                  PreferenceService.instance.shouldLaunchAtLogin(),
+              onChanged: () async {
+                final newValue =
+                    !PreferenceService.instance.shouldLaunchAtLogin();
+                await LaunchAtLoginService.instance.setEnabled(newValue);
+                await PreferenceService.instance
+                    .setShouldLaunchAtLogin(newValue);
+                if (newValue &&
+                    !PreferenceService.instance
+                        .shouldMinimizeToTrayOnClose()) {
+                  await PreferenceService.instance
+                      .setShouldMinimizeToTrayOnClose(true);
+                }
                 setState(() {});
               },
             ),

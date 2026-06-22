@@ -11,6 +11,7 @@ import 'package:ente_auth/locale.dart';
 import 'package:ente_auth/services/auth_theme_preferences.dart';
 import 'package:ente_auth/services/authenticator_service.dart';
 import 'package:ente_auth/services/billing_service.dart';
+import 'package:ente_auth/services/launch_at_login_service.dart';
 import 'package:ente_auth/services/local_backup_service.dart';
 import 'package:ente_auth/services/notification_service.dart';
 import 'package:ente_auth/services/preference_service.dart';
@@ -78,6 +79,9 @@ void main() async {
     await windowManager.ensureInitialized();
     await WindowListenerService.instance.init();
     await windowManager.setPreventClose(true);
+    await LaunchAtLoginService.instance.init();
+    final bool startHidden =
+        Platform.isMacOS && LaunchAtLoginService.instance.wasAutoLaunched;
     WindowOptions windowOptions = WindowOptions(
       size: WindowListenerService.instance.getWindowSize(),
       maximumSize: const Size(8192, 8192),
@@ -85,11 +89,16 @@ void main() async {
     bool isMaximized = WindowListenerService.instance.getIsMaximized();
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
       await auth_dir_utils.DirectoryUtils.migrateNamingChanges();
-      await windowManager.show();
-      if (isMaximized) {
-        await windowManager.maximize();
+      if (startHidden) {
+        await windowManager.hide();
+        await windowManager.setSkipTaskbar(true);
+      } else {
+        await windowManager.show();
+        if (isMaximized) {
+          await windowManager.maximize();
+        }
+        await windowManager.focus();
       }
-      await windowManager.focus();
       initSystemTray().ignore();
     });
   }

@@ -25,6 +25,7 @@ class PreferenceService {
   static const kShouldMinimizeOnCopy = "should_minimize_on_copy";
   static const kShouldMinimizeToTrayOnClose =
       "should_minimize_to_tray_on_close";
+  static const kShouldLaunchAtLogin = "should_launch_at_login";
   static const kCompactMode = "vi.compactMode";
   static const kAppInstallTime = "appInstallTime";
 
@@ -118,6 +119,14 @@ class PreferenceService {
 
   Future<void> setShouldMinimizeToTrayOnClose(bool value) async {
     await _prefs.setBool(kShouldMinimizeToTrayOnClose, value);
+  }
+
+  bool shouldLaunchAtLogin() {
+    return _prefs.getBool(kShouldLaunchAtLogin) ?? false;
+  }
+
+  Future<void> setShouldLaunchAtLogin(bool value) async {
+    await _prefs.setBool(kShouldLaunchAtLogin, value);
   }
 
   int getAppInstalledTime() {
