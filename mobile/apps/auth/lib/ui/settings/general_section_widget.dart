@@ -29,6 +29,20 @@ class AdvancedSectionWidget extends StatefulWidget {
 }
 
 class _AdvancedSectionWidgetState extends State<AdvancedSectionWidget> {
+  bool? _isLaunchAtLoginEnabled;
+
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isMacOS && LaunchAtLoginService.isSupported) {
+      LaunchAtLoginService.instance.isEnabled().then((enabled) {
+        if (mounted) {
+          setState(() => _isLaunchAtLoginEnabled = enabled);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -151,17 +165,17 @@ class _AdvancedSectionWidgetState extends State<AdvancedSectionWidget> {
           ),
           sectionOptionSpacing,
         ],
-        if (Platform.isMacOS && LaunchAtLoginService.isSupported) ...[
+        if (Platform.isMacOS &&
+            LaunchAtLoginService.isSupported &&
+            _isLaunchAtLoginEnabled != null) ...[
           MenuItemWidget(
             captionedTextWidget: CaptionedTextWidget(
               title: l10n.launchAtLogin,
             ),
             trailingWidget: ToggleSwitchWidget(
-              value: () =>
-                  PreferenceService.instance.shouldLaunchAtLogin(),
+              value: () => _isLaunchAtLoginEnabled!,
               onChanged: () async {
-                final newValue =
-                    !PreferenceService.instance.shouldLaunchAtLogin();
+                final newValue = !_isLaunchAtLoginEnabled!;
                 await LaunchAtLoginService.instance.setEnabled(newValue);
                 await PreferenceService.instance
                     .setShouldLaunchAtLogin(newValue);
@@ -171,6 +185,7 @@ class _AdvancedSectionWidgetState extends State<AdvancedSectionWidget> {
                   await PreferenceService.instance
                       .setShouldMinimizeToTrayOnClose(true);
                 }
+                _isLaunchAtLoginEnabled = newValue;
                 setState(() {});
               },
             ),
