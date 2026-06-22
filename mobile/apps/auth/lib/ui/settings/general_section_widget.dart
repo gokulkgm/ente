@@ -4,6 +4,7 @@ import 'package:ente_auth/app/view/app.dart';
 import 'package:ente_auth/events/icons_changed_event.dart';
 import 'package:ente_auth/l10n/l10n.dart';
 import 'package:ente_auth/locale.dart';
+import 'package:ente_auth/services/launch_at_login_service.dart';
 import 'package:ente_auth/services/preference_service.dart';
 import 'package:ente_auth/theme/ente_theme.dart';
 import 'package:ente_auth/ui/components/captioned_text_widget.dart';
@@ -28,6 +29,20 @@ class AdvancedSectionWidget extends StatefulWidget {
 }
 
 class _AdvancedSectionWidgetState extends State<AdvancedSectionWidget> {
+  bool? _isLaunchAtLoginEnabled;
+
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isMacOS && LaunchAtLoginService.isSupported) {
+      LaunchAtLoginService.instance.isEnabled().then((enabled) {
+        if (mounted) {
+          setState(() => _isLaunchAtLoginEnabled = enabled);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -144,6 +159,33 @@ class _AdvancedSectionWidgetState extends State<AdvancedSectionWidget> {
                 await PreferenceService.instance.setShouldMinimizeOnCopy(
                   !PreferenceService.instance.shouldMinimizeOnCopy(),
                 );
+                setState(() {});
+              },
+            ),
+          ),
+          sectionOptionSpacing,
+        ],
+        if (Platform.isMacOS &&
+            LaunchAtLoginService.isSupported &&
+            _isLaunchAtLoginEnabled != null) ...[
+          MenuItemWidget(
+            captionedTextWidget: CaptionedTextWidget(
+              title: l10n.launchAtLogin,
+            ),
+            trailingWidget: ToggleSwitchWidget(
+              value: () => _isLaunchAtLoginEnabled!,
+              onChanged: () async {
+                final newValue = !_isLaunchAtLoginEnabled!;
+                await LaunchAtLoginService.instance.setEnabled(newValue);
+                await PreferenceService.instance
+                    .setShouldLaunchAtLogin(newValue);
+                if (newValue &&
+                    !PreferenceService.instance
+                        .shouldMinimizeToTrayOnClose()) {
+                  await PreferenceService.instance
+                      .setShouldMinimizeToTrayOnClose(true);
+                }
+                _isLaunchAtLoginEnabled = newValue;
                 setState(() {});
               },
             ),

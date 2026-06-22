@@ -401,6 +401,7 @@
   "shouldHideCode": "Hide codes",
   "doubleTapToViewHiddenCode": "You can double tap on an entry to view code",
   "focusOnSearchBar": "Focus search on app start",
+  "launchAtLogin": "Launch at login",
   "minimizeToTrayOnClose": "Minimize to tray on close",
   "confirmUpdatingkey": "Are you sure you want to update the secret key?",
   "minimizeAppOnCopy": "Minimize app on copy",
