@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:ente_auth/app/view/app.dart';
 import 'package:ente_auth/events/icons_changed_event.dart';
 import 'package:ente_auth/locale.dart';
+import 'package:ente_auth/services/launch_at_login_service.dart';
 import 'package:ente_auth/services/preference_service.dart';
 import 'package:ente_auth/ui/settings/app_icon_selection_screen.dart';
 import 'package:ente_auth/ui/settings/components/auth_settings_navigation.dart';
@@ -101,7 +102,7 @@ class GeneralSettingsPage extends StatelessWidget {
                       !PreferenceService.instance.shouldMinimizeToTrayOnClose(),
                     ),
               ),
-            if (Platform.isMacOS)
+            if (Platform.isMacOS) ...[
               _toggleItem(
                 title: l10n.menubarMode,
                 value: PreferenceService.instance.isMenubarModeEnabled,
@@ -114,6 +115,19 @@ class GeneralSettingsPage extends StatelessWidget {
                   }
                 },
               ),
+              if (LaunchAtLoginService.instance.isSupported)
+                ValueListenableBuilder<bool>(
+                  valueListenable:
+                      LaunchAtLoginService.instance.enabledListenable,
+                  builder: (context, _, _) => _toggleItem(
+                    title: l10n.launchAtLogin,
+                    value: () => LaunchAtLoginService.instance.isEnabled,
+                    onChanged: () => LaunchAtLoginService.instance.setEnabled(
+                      !LaunchAtLoginService.instance.isEnabled,
+                    ),
+                  ),
+                ),
+            ],
             _toggleItem(
               title: l10n.crashAndErrorReporting,
               value: SuperLogging.shouldReportErrors,

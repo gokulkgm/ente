@@ -7,6 +7,7 @@ import 'package:ente_auth/locale.dart';
 import 'package:ente_auth/onboarding/view/onboarding_page.dart';
 import 'package:ente_auth/services/auth_theme_preferences.dart';
 import 'package:ente_auth/services/authenticator_service.dart';
+import 'package:ente_auth/services/launch_at_login_service.dart';
 import 'package:ente_auth/services/update_service.dart';
 import 'package:ente_auth/services/window_listener_service.dart';
 import 'package:ente_auth/ui/home_page.dart';
@@ -113,6 +114,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
+      LaunchAtLoginService.instance.refresh().ignore();
       if (Configuration.instance.hasConfiguredAccount()) {
         AuthenticatorService.instance.onlineSync().ignore();
       }

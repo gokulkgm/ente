@@ -11,6 +11,7 @@ import 'package:ente_auth/locale.dart';
 import 'package:ente_auth/services/auth_theme_preferences.dart';
 import 'package:ente_auth/services/authenticator_service.dart';
 import 'package:ente_auth/services/billing_service.dart';
+import 'package:ente_auth/services/launch_at_login_service.dart';
 import 'package:ente_auth/services/local_backup_service.dart';
 import 'package:ente_auth/services/notification_service.dart';
 import 'package:ente_auth/services/preference_service.dart';
@@ -200,6 +201,7 @@ Future<void> _init(bool bool, {String? via}) async {
   await CryptoUtil.init();
 
   await PreferenceService.instance.init();
+  await LaunchAtLoginService.instance.init();
   await CodeStore.instance.init();
   await CodeDisplayStore.instance.init();
   await Configuration.instance.init([AuthenticatorDB.instance]);

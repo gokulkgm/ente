@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:ente_accounts/services/user_service.dart';
 import 'package:ente_auth/core/configuration.dart';
 import 'package:ente_auth/onboarding/view/onboarding_page.dart';
+import 'package:ente_auth/services/launch_at_login_service.dart';
 import 'package:ente_auth/services/review_service.dart';
 import 'package:ente_auth/store/code_store.dart';
 import 'package:ente_auth/ui/settings/about_settings_page.dart';
@@ -128,7 +130,10 @@ class SettingsPage extends StatelessWidget {
         title: l10n.general,
         icon: HugeIcons.strokeRoundedSettings01,
         semanticsIdentifier: 'auth_settings_general',
-        onTap: () => pushAuthSettingsPage(context, const GeneralSettingsPage()),
+        onTap: () {
+          LaunchAtLoginService.instance.refresh().ignore();
+          pushAuthSettingsPage(context, const GeneralSettingsPage());
+        },
       ),
       const SizedBox(height: Spacing.sm),
       AppEngagementSection(reviewUrl: ReviewService.url),
