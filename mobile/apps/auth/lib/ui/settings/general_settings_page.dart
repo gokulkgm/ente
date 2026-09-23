@@ -116,11 +116,15 @@ class GeneralSettingsPage extends StatelessWidget {
                 },
               ),
               if (LaunchAtLoginService.instance.isSupported)
-                _toggleItem(
-                  title: l10n.launchAtLogin,
-                  value: () => LaunchAtLoginService.instance.isEnabled,
-                  onChanged: () => LaunchAtLoginService.instance.setEnabled(
-                    !LaunchAtLoginService.instance.isEnabled,
+                ValueListenableBuilder<bool>(
+                  valueListenable:
+                      LaunchAtLoginService.instance.enabledListenable,
+                  builder: (context, _, _) => _toggleItem(
+                    title: l10n.launchAtLogin,
+                    value: () => LaunchAtLoginService.instance.isEnabled,
+                    onChanged: () => LaunchAtLoginService.instance.setEnabled(
+                      !LaunchAtLoginService.instance.isEnabled,
+                    ),
                   ),
                 ),
             ],
